@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\UtilisateurRepository;
+use App\Entity\Roles;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UtilisateurRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-class Utilisateur
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -33,6 +37,9 @@ class Utilisateur
 
     #[ORM\Column(length: 255)]
     private ?string $mdp_utilisateur = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $Bloquer = false;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -127,15 +134,31 @@ class Utilisateur
         return $this;
     }
 
-    public function getRoles(): ?Roles
+   public function getRoles(): array
     {
-        return $this->roles;
+        return [$this->roles ? $this->roles->getNomRole() : 'ROLE_USER'];
     }
 
-    public function setRoles(?Roles $roles): static
+    public function setRoles(?Roles $roles): self
     {
         $this->roles = $roles;
 
         return $this;
     }
+    public function Bloquer(): bool
+    {
+        return $this->Bloquer;
+    }
+
+    public function setBloquer(bool $Bloquer): self
+    {
+        $this->Bloquer = $Bloquer;
+        return $this;
+    }
+
+    public function getUserIdentifier(): string  { return (string) $this->email_utilisateur; }
+    public function getPassword(): ?string { return $this->mdp_utilisateur; }
+    public function getSalt(): ?string { return null; }
+    public function eraseCredentials(): void { }
+    public function getPasswordHasherName(): ?string  { return null; }
 }
