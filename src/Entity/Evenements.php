@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Categorie;
+use App\Entity\Utilisateur;
+use App\Entity\Ville;
 use App\Repository\EvenementsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,6 +41,17 @@ class Evenements
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $price_place = null;
 
+    #[ORM\Column(length: 20, options: ['default' => 'pending'])]
+    private ?string $status_validation = 'pending';
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $date_validation = null;
+
+
+    #[ORM\Column(type: 'boolean')]
+
+    private bool $is_Sponsor = false;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Categorie $Categorie = null;
@@ -49,6 +63,8 @@ class Evenements
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $Utilisateur = null;
+
+
 
     public function getId(): ?int
     {
@@ -151,6 +167,46 @@ class Evenements
         return $this;
     }
 
+    public function getStatusValidation(): ?string
+    {
+        return $this->status_validation;
+    }
+
+    public function setStatusValidation(string $status_validation): static
+    {
+        $this->status_validation = $status_validation;
+
+        return $this;
+    }
+
+    public function getDateValidation(): ?\DateTime
+    {
+        return $this->date_validation;
+    }
+
+    public function setDateValidation(?\DateTime $date_validation): static
+    {
+        $this->date_validation = $date_validation;
+
+        return $this;
+    }
+
+  
+    public function getIsSponsor() : bool
+    {
+        return $this->is_Sponsor;
+    }
+
+   
+ 
+    public function setIsSponsor(bool $isSponsor): static
+    {
+        $this->is_Sponsor = $isSponsor;
+
+        return $this;
+    }
+
+
     public function getCategorie(): ?Categorie
     {
         return $this->Categorie;
@@ -186,4 +242,7 @@ class Evenements
 
         return $this;
     }
+    
+
+ 
 }
