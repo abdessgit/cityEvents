@@ -7,7 +7,6 @@ use App\Entity\Utilisateur;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UtilisateurRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 final class UtilisateurController extends AbstractController
 {
    // ajouter un Utilisateur a la base donnes via postman
-    #[Route('/users/inscription', name: 'app_users_inscription', methods: ['POST'])]
+    #[Route('/api/v1/users/inscription', name: 'app_users_inscription', methods: ['POST'])]
     public function inscription(Request $request, EntityManagerInterface $manager , UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -30,7 +29,7 @@ final class UtilisateurController extends AbstractController
 
 
        if( $email === "" || $mdp === ""  || $nom  === "" || $prenom === "" || $tel === ""){
-            return $this->json(['erreur' => "merci de remplire la valeur "], 400);
+            return $this->json(['erreur' => "merci de remplire toutes les valeurs "], 400);
        }
            // Vérifier si l'email existe
         $emailExiste = $manager->getRepository(Utilisateur::class)
@@ -66,7 +65,6 @@ final class UtilisateurController extends AbstractController
         $utilisateur->setTelUtilisateur($tel);
         $utilisateur->setIpUtilisateur($ip_adress);
 
-
         $manager->persist($utilisateur);
         $manager->flush();
 
@@ -77,7 +75,7 @@ final class UtilisateurController extends AbstractController
     }
 
     // la methode pour ajouter un modeutilisateur$utilisateur ou Admin 
-    #[Route('/users/inscrire_moderator', name: 'app_inscrire_rator', methods: ['POST'])]
+    #[Route('/api/v1/users/inscrire_moderator', name: 'app_inscrire_rator', methods: ['POST'])]
     public function inscrireModerator(Request $request, EntityManagerInterface $manager , UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -134,7 +132,7 @@ final class UtilisateurController extends AbstractController
     ], 201);
     }
 
-    #[Route('/users/{id}/bloque', name: 'app_user_bloque', methods: ['PATCH'])]
+    #[Route('/api/v1/users/{id}/bloque', name: 'app_user_bloque', methods: ['PATCH'])]
     public function blockUser( int $id,  EntityManagerInterface $manager): JsonResponse
        
     {
@@ -151,7 +149,7 @@ final class UtilisateurController extends AbstractController
         'success' => 'Utilisateur bloqué avec succès'
     ]);
     }
-    #[Route('/users/{id}/debloquer', name: 'app_user_debloquer', methods: ['PATCH'])]
+    #[Route('/api/v1/users/{id}/debloquer', name: 'app_user_debloquer', methods: ['PATCH'])]
 public function debloquerUser( int $id, EntityManagerInterface $manager): JsonResponse
    
 {
@@ -167,17 +165,25 @@ public function debloquerUser( int $id, EntityManagerInterface $manager): JsonRe
         'success' => 'Utilisateur débloqué avec succès'
     ]);
     }
-    // methode tomporaire pour generer le token 
-    #[Route('/users/login', name: 'app_user_login', methods: ['POST'])]
-    public function login( int $id, EntityManagerInterface $manager): JsonResponse
-    { 
+    #[Route('/api/v1/users/connecter', name: 'app_user_connecter', methods: ['GET'])]
+    public function connecter(): JsonResponse
+    {
+        $user = $this->getUser(); // récupère l'utilisateur authentifié via JWT
 
-    return $this->json([
-        'success' => 'token'
-    ]);
+        if (!$user) {
+            return $this->json(['erreur' => 'Utilisateur non connecté'], 401);
+        }
+
+        return $this->json([
+            'email' => $user->getEmailUtilisateur(),
+            'roles' => $user->getRoles(),
+            'nom' => $user->getNomUtilisateur(),
+            'prenom' => $user->getPrenomUtilisateur()
+        ]);
     }
+
     //methode pour afficher tout les utilisateur 
-    #[Route('/users/get_user', name: 'app_get_user', methods: ['GET'])]
+    #[Route('/api/v1/users/get_user', name: 'app_get_user', methods: ['GET'])]
     public function getAllUser(EntityManagerInterface $manager, UtilisateurRepository $repo ): JsonResponse
     {
 
@@ -200,7 +206,7 @@ public function debloquerUser( int $id, EntityManagerInterface $manager): JsonRe
          return $this->json($data);
     }
         
-    #[Route('/users/get_Mode', name: 'users_get_mode', methods: ['GET'])]
+    #[Route('/api/v1/users/get_Mode', name: 'users_get_mode', methods: ['GET'])]
     public function getAllMode(UtilisateurRepository $repo): JsonResponse
     {
         $users = $repo->findAll();
@@ -219,6 +225,11 @@ public function debloquerUser( int $id, EntityManagerInterface $manager): JsonRe
             ];
         }
         return $this->json($data);
+    }
+    #[Route('/api/v1/users/login', name: 'app_user_login', methods: ['POST'])]
+    public function login(): JsonResponse
+    {
+        return $this->json(['success' => ' tester token']);
     }
 
 

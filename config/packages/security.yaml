@@ -14,18 +14,18 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         login:
-            pattern: ^/users/login
+            pattern: ^/api/v1/users/login
             stateless: true
             provider: users_in_database
             json_login:
-                check_path: /users/login
+                check_path: /api/v1/users/login
                 username_path: email_utilisateur
                 password_path: mdp_utilisateur
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         api:
-            pattern: ^/users
+            pattern: ^/api/v1/users
             stateless: true
             provider: users_in_database
             jwt: ~
@@ -45,8 +45,26 @@ security:
     access_control:
         #- { path: ^/users/login, roles: PUBLIC_ACCESS }
         # - { path: ^/users, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/users/\d+/bloque, roles: ROLE_ADMIN }
-
+        #------------------------------------------------------------------------------
+        # toute les route concernat l'utilisateur 
+       
+        - { path: ^/api/v1/users/connecter, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/v1/users/inscrire_moderator, roles:['ROLE_ADMIN'] }
+        - { path: ^/api/v1/users/get_Mode, roles:['ROLE_ADMIN'] }
+        - { path: ^/api/v1/users/get_user, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] }
+        - { path: ^/api/v1/users/\d+/bloque, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] }
+        - { path: ^/api/v1/users/\d+/debloquer, roles: ['ROLE_ADMIN', 'ROLE_MODERATEUR'] }
+        #--------------------------------------------------------------------------------
+        # toutes les route concernat evenements 
+        - { path: ^/api/v1/events_add/d+/event, roles: ROLE_USER }
+        #- { path: ^/api/v1/events_by_user/d+, roles: ROLE_USER , roles: ROLE_ADMIN , roles: ROLE_MODERATEUR }
+        - {path: ^/api/v1/events/d+,  roles:['ROLE_USER' , 'ROLE_ADMIN' , 'ROLE_MODERATEUR'] }
+        - { path: ^/api/v1/events/pending, roles: [ROLE_ADMIN , ROLE_MODERATEUR ,'ROLE_USER' ] }
+        - { path: ^/api/v1/events/d+/validate, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] }  
+        - { path: ^/api/v1/events/d+/refuse, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] } 
+        - { path: ^/api/v1/events/d+/sponsored, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] } 
+        - { path: ^/api/v1/events/d+/noSponsored, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] } 
+        
 when@test:
     security:
         password_hashers:

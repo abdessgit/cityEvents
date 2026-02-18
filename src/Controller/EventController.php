@@ -4,12 +4,10 @@ namespace App\Controller;
 
 use App\Controller\CategoryController;
 use App\Controller\VilleController;
-
 use App\Entity\Evenements;
 use App\Entity\Utilisateur;
 use App\Repository\CategorieRepository;
 use App\Repository\EvenementsRepository;
-
 use App\Repository\UtilisateurRepository;
 use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,12 +20,12 @@ class EventController extends AbstractController
 {
     public function __construct(private EntityManagerInterface $entityManager) {}
     // Crée un nouvel événement (faut que tu remplisses tous les champs obligatoires)
-    #[Route('/api/events_add/{id}/event', name: 'api_events_create', methods: ['POST'])]
+    #[Route('/api/v1/events_add/{id}/event', name: 'api_events_create', methods: ['POST'])]
     public function create(int $id, EntityManagerInterface $manager, CategoryController $categoryController, VilleController $villeController, EntityManagerInterface $entityManager, Request $request, UtilisateurRepository $users, VilleRepository $cities, CategorieRepository $categories, ImagesController $imagesController): JsonResponse
     {
 
         $user = $manager->getRepository(Utilisateur::class)->find($id);
-        // Creation d'un event
+        
         $data = $request->request->all();
         
         $files = $request->files->get('images');
@@ -39,7 +37,6 @@ class EventController extends AbstractController
         $required = [
             'title',
             'description',
-            'dateCreation',
             'address',
             'seats',
             'price',
@@ -58,7 +55,7 @@ class EventController extends AbstractController
         // Récupérer et valider les objets AVANT de créer l'événement
       
 
-        // Récupérer ou créer la ville si elle n'existe pas
+      
         $cityValue = $data['cityId'] ?? $data['city'] ?? null;
         $city = $villeController->getOrCreateCity($entityManager, $cityValue, $cities);
         if ($city === null) {
@@ -72,14 +69,14 @@ class EventController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la création de la catégorie'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        // Créer l'événement avec les objets réels, pas les IDs
+        
         $event = new Evenements();
         $event->setNomEvenement($data['title']);
         $event->setDescriptionEvent($data['description']);
         $event->setAdresse($data['address']);
         $event->setNbrePlace($data['seats']);
         $event->setPricePlace($data['price']);
-        $event->setDateCreation(new \DateTime($data['dateCreation']));
+        $event->setDateCreation(new \DateTime());
         $event->setDateDebut(new \DateTime($data['dateStart']));
         $event->setDateFin(new \DateTime($data['dateEnd']));
         $event->setUtilisateur($user);
@@ -98,10 +95,10 @@ class EventController extends AbstractController
             $result = $imagesController->addImages($event, $files, $entityManager);
 
             if (isset($result['error'])) {
-                return new JsonResponse($result, 400); // arrête tout, pas de flush
+                return new JsonResponse($result, 400); // pas de flush
             }
 
-            $uploadedImages = $result; // images valides
+            $uploadedImages = $result; 
         }
        
     return new JsonResponse([
@@ -115,7 +112,7 @@ class EventController extends AbstractController
     }
 
 
-    #[Route('/api/events_list', name: 'api_events_list_simple', methods: ['GET'])]
+    #[Route('/api/v1//events_list', name: 'api_events_list_simple', methods: ['GET'])]
     public function listSimple(EvenementsRepository $events): JsonResponse
         {
             // Liste simple des events sans filtres
@@ -137,7 +134,7 @@ class EventController extends AbstractController
             return new JsonResponse($data);
         }
 
-        #[Route('/api/get_events_by_filtre', name: 'api_events_list_by_filter', methods: ['POST'])]
+        #[Route('/api/v1/get_events_by_filtre', name: 'api_events_list_by_filter', methods: ['POST'])]
         public function listByFilter(Request $request, EvenementsRepository $events, VilleRepository $cities, CategorieRepository $categories): JsonResponse
         {   
             $data = json_decode($request->getContent(), true);
@@ -212,7 +209,7 @@ class EventController extends AbstractController
         }      
     
         //afficher les evenements en fonction de lutilisateur
-        #[Route('/api/events_by_user/{id}', name: 'api_events_by_user', methods: ['GET'])]
+        #[Route('/api/v1/events_by_user/{id}', name: 'api_events_by_user', methods: ['GET'])]
         public function listByUser(int $id, EvenementsRepository $events , UtilisateurRepository $users, EntityManagerInterface $manager): JsonResponse
         {
 
@@ -250,7 +247,7 @@ class EventController extends AbstractController
 
         }
     // Affiche les détails d'un événement spécifique en cherchant par son ID
-    #[Route('/api/events/{id<\d+>}', name: 'api_events_show', methods: ['GET'])]
+    #[Route('/api/v1/events/{id<\d+>}', name: 'api_events_show', methods: ['GET'])]
     public function show(?Evenements $event = null): JsonResponse
     {
         // Detail d'un event par ID
@@ -262,7 +259,7 @@ class EventController extends AbstractController
     }
 
     // Te montre les événements qui sont en attente de validation (pas encore approuvés)
-    #[Route('/api/events/pending', name: 'api_events_pending', methods: ['GET'])]
+    #[Route('/api/v1/events/pending', name: 'api_events_pending', methods: ['GET'])]
     public function pending(EvenementsRepository $events): JsonResponse
     {
         // Liste des events en attente
@@ -288,7 +285,7 @@ class EventController extends AbstractController
     }
 
     // Valide un événement et le marque comme approuvé (t'es manager quoi)
-    #[Route('/api/events/{id<\d+>}/validate', name: 'api_events_validate', methods: ['PATCH'])]
+    #[Route('/api/v1/events/{id<\d+>}/validate', name: 'api_events_validate', methods: ['PATCH'])]
     public function validate(?Evenements $event = null): JsonResponse
     {
         // Valide un event
@@ -311,7 +308,7 @@ class EventController extends AbstractController
     }
 
     // Refuse un événement et tu dois donner une raison (pourquoi tu le rejettes)
-    #[Route('/api/events/{id<\d+>}/refuse', name: 'api_events_refuse', methods: ['PATCH'])]
+    #[Route('/api/v1/events/{id<\d+>}/refuse', name: 'api_events_refuse', methods: ['PATCH'])]
     public function refuse(?Evenements $event, Request $request): JsonResponse
     {
         // Refuse un event avec motif
@@ -335,7 +332,7 @@ class EventController extends AbstractController
     }
     // pour afficher l'événement  sponsoriés
 
-    #[Route('/api/events/{id}/sponsored', name: 'api_events_sponsored', methods: ['PATCH'])]
+    #[Route('/api/v1/events/{id}/sponsored', name: 'api_events_sponsored', methods: ['PATCH'])]
 
     public function sponsored(EntityManagerInterface $entityManager, int $id): JsonResponse
     {
@@ -354,7 +351,7 @@ class EventController extends AbstractController
         return $this->json(['message' => 'événements sponsorisés']);
     }
 
- #[Route('/api/events/{id}/noSponsored', name: 'api_events_noSponsored', methods: ['PATCH'])]
+ #[Route('/api/v1/events/{id}/noSponsored', name: 'api_events_noSponsored', methods: ['PATCH'])]
  
    public function noSponsored(EntityManagerInterface $entityManager, int $id): JsonResponse
     {
@@ -373,7 +370,7 @@ class EventController extends AbstractController
         return $this->json(['message' => 'événements rendu non sponsorisés']);
     }
 
- #[Route('/api/events/listEventsSponsored', name: 'api_events_listEventsSponsored', methods: ['GET'])]
+ #[Route('/api/v1/events/listEventsSponsored', name: 'api_events_listEventsSponsored', methods: ['GET'])]
     public function listEventsSponsored(EntityManagerInterface $entityManager,EvenementsRepository $evenementsRepository) : JsonResponse
     {
       $eventsSponsor = $entityManager->getRepository(Evenements::class)->findBy(['is_Sponsor' => true]);

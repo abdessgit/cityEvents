@@ -6,20 +6,11 @@ use App\Entity\Ville;
 use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Config\Doctrine\Orm\EntityManagerConfig;
+
 
 final class VilleController extends AbstractController
 {
-    #[Route('/ville', name: 'app_ville')]
-    public function index(): Response
-    {
-        return $this->render('ville/index.html.twig', [
-            'controller_name' => 'VilleController',
-        ]);
-    }
-
+    
      // Récupère ou crée une ville s'il n'existe pas
    public function getOrCreateCity( EntityManagerInterface $entityManager, mixed $value, VilleRepository $cities): ?Ville
     {
