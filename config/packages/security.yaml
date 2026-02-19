@@ -1,14 +1,35 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         users_in_memory: { memory: null }
+        users_in_database:
+            entity:
+                class: App\Entity\Utilisateur
+                property: email_utilisateur
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        login:
+            pattern: ^/api/v1/users/login
+            stateless: true
+            provider: users_in_database
+            json_login:
+                check_path: /api/v1/users/login
+                username_path: email_utilisateur
+                password_path: mdp_utilisateur
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api/v1/users
+            stateless: true
+            provider: users_in_database
+            jwt: ~
+
         main:
             lazy: true
             provider: users_in_memory
@@ -22,9 +43,28 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-
+        #- { path: ^/users/login, roles: PUBLIC_ACCESS }
+        # - { path: ^/users, roles: IS_AUTHENTICATED_FULLY }
+        #------------------------------------------------------------------------------
+        # toute les route concernat l'utilisateur 
+       
+        - { path: ^/api/v1/users/connecter, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/v1/users/inscrire_moderator, roles:['ROLE_ADMIN'] }
+        - { path: ^/api/v1/users/get_Mode, roles:['ROLE_ADMIN'] }
+        - { path: ^/api/v1/users/get_user, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] }
+        - { path: ^/api/v1/users/\d+/bloque, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] }
+        - { path: ^/api/v1/users/\d+/debloquer, roles: ['ROLE_ADMIN', 'ROLE_MODERATEUR'] }
+        #--------------------------------------------------------------------------------
+        # toutes les route concernat evenements 
+        - { path: ^/api/v1/events_add/d+/event, roles: ROLE_USER }
+        #- { path: ^/api/v1/events_by_user/d+, roles: ROLE_USER , roles: ROLE_ADMIN , roles: ROLE_MODERATEUR }
+        - {path: ^/api/v1/events/d+,  roles:['ROLE_USER' , 'ROLE_ADMIN' , 'ROLE_MODERATEUR'] }
+        - { path: ^/api/v1/events/pending, roles: [ROLE_ADMIN , ROLE_MODERATEUR ,'ROLE_USER' ] }
+        - { path: ^/api/v1/events/d+/validate, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] }  
+        - { path: ^/api/v1/events/d+/refuse, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] } 
+        - { path: ^/api/v1/events/d+/sponsored, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] } 
+        - { path: ^/api/v1/events/d+/noSponsored, roles:['ROLE_ADMIN', 'ROLE_MODERATEUR'] } 
+        
 when@test:
     security:
         password_hashers:

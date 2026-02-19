@@ -2,6 +2,15 @@
 
 namespace App\Entity;
 
+<<<<<<< HEAD
+=======
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Images;
+use App\Entity\Categorie;
+use App\Entity\Utilisateur;
+use App\Entity\Ville;
+>>>>>>> Abdesslam
 use App\Repository\EvenementsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,6 +47,20 @@ class Evenements
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $price_place = null;
 
+<<<<<<< HEAD
+=======
+    #[ORM\Column(length: 20, options: ['default' => 'pending'])]
+    private ?string $status_validation = 'pending';
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $date_validation = null;
+
+
+    #[ORM\Column(type: 'boolean')]
+
+    private bool $is_Sponsor = false;
+
+>>>>>>> Abdesslam
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Categorie $Categorie = null;
@@ -50,6 +73,18 @@ class Evenements
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $Utilisateur = null;
 
+<<<<<<< HEAD
+=======
+    #[ORM\OneToMany(mappedBy: 'evenements', targetEntity: Images::class, cascade: ['persist', 'remove'])]
+    private Collection $images;
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
+
+
+
+>>>>>>> Abdesslam
     public function getId(): ?int
     {
         return $this->id;
@@ -151,6 +186,49 @@ class Evenements
         return $this;
     }
 
+<<<<<<< HEAD
+=======
+    public function getStatusValidation(): ?string
+    {
+        return $this->status_validation;
+    }
+
+    public function setStatusValidation(string $status_validation): static
+    {
+        $this->status_validation = $status_validation;
+
+        return $this;
+    }
+
+    public function getDateValidation(): ?\DateTime
+    {
+        return $this->date_validation;
+    }
+
+    public function setDateValidation(?\DateTime $date_validation): static
+    {
+        $this->date_validation = $date_validation;
+
+        return $this;
+    }
+
+  
+    public function getIsSponsor() : bool
+    {
+        return $this->is_Sponsor;
+    }
+
+   
+ 
+    public function setIsSponsor(bool $isSponsor): static
+    {
+        $this->is_Sponsor = $isSponsor;
+
+        return $this;
+    }
+
+
+>>>>>>> Abdesslam
     public function getCategorie(): ?Categorie
     {
         return $this->Categorie;
@@ -186,4 +264,37 @@ class Evenements
 
         return $this;
     }
+<<<<<<< HEAD
 }
+=======
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+ 
+// Ajouter une image
+    public function addImage(Images $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+            $image->setEvenements($this);
+        }
+        return $this;
+    }
+
+    // Retirer une image
+    public function removeImage(Images $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getEvenements() === $this) {
+                $image->setEvenements(null);
+            }
+        }
+        return $this;
+    }
+
+
+
+ 
+}
+>>>>>>> Abdesslam

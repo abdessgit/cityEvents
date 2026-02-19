@@ -2,11 +2,23 @@
 
 namespace App\Entity;
 
+<<<<<<< HEAD
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 class Utilisateur
+=======
+use App\Entity\Roles;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UtilisateurRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
+#[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
+>>>>>>> Abdesslam
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -34,6 +46,12 @@ class Utilisateur
     #[ORM\Column(length: 255)]
     private ?string $mdp_utilisateur = null;
 
+<<<<<<< HEAD
+=======
+    #[ORM\Column(type: 'boolean')]
+    private bool $Bloquer = false;
+
+>>>>>>> Abdesslam
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Roles $roles = null;
@@ -127,15 +145,43 @@ class Utilisateur
         return $this;
     }
 
+<<<<<<< HEAD
     public function getRoles(): ?Roles
     {
         return $this->roles;
     }
 
     public function setRoles(?Roles $roles): static
+=======
+   public function getRoles(): array
+    {
+        return [$this->roles ? $this->roles->getNomRole() : 'ROLE_USER'];
+    }
+
+    public function setRoles(?Roles $roles): self
+>>>>>>> Abdesslam
     {
         $this->roles = $roles;
 
         return $this;
     }
+<<<<<<< HEAD
+=======
+    public function Bloquer(): bool
+    {
+        return $this->Bloquer;
+    }
+
+    public function setBloquer(bool $Bloquer): self
+    {
+        $this->Bloquer = $Bloquer;
+        return $this;
+    }
+
+    public function getUserIdentifier(): string  { return (string) $this->email_utilisateur; }
+    public function getPassword(): ?string { return $this->mdp_utilisateur; }
+    public function getSalt(): ?string { return null; }
+    public function eraseCredentials(): void { }
+    public function getPasswordHasherName(): ?string  { return null; }
+>>>>>>> Abdesslam
 }
