@@ -36,7 +36,7 @@ class ImagesController extends AbstractController
 
             $image = new Images();
             $image->setNomImages($newFilename);
-            $image->setEvenements($event);
+            $event->addImage($image);
 
             $manager->persist($image);
             $uploadedImages[] = $newFilename;

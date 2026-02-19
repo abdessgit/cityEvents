@@ -42,8 +42,8 @@ class EventController extends AbstractController
             'price',
             'dateStart',
             'dateEnd',
-            'cityId',
-            'categoryId',
+            'cityName',
+            'categoryName',
         ];
        
 
@@ -56,14 +56,14 @@ class EventController extends AbstractController
       
 
       
-        $cityValue = $data['cityId'] ?? $data['city'] ?? null;
+        $cityValue = $data['cityName'] ?? $data['city'] ?? null;
         $city = $villeController->getOrCreateCity($entityManager, $cityValue, $cities);
         if ($city === null) {
             return new JsonResponse(['error' => 'Erreur lors de la création de la ville'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         // Récupérer ou créer la catégorie si elle n'existe pas
-        $categoryValue = $data['categoryId'] ?? $data['category'] ?? null;
+        $categoryValue = $data['categoryName'] ?? $data['category'] ?? null;
         $category = $categoryController->getOrCreateCategory($entityManager, $categoryValue, $categories);
         if ($category === null) {
             return new JsonResponse(['error' => 'Erreur lors de la création de la catégorie'], JsonResponse::HTTP_BAD_REQUEST);
@@ -119,6 +119,17 @@ class EventController extends AbstractController
             $items = $events->findAll();
             $data = [];
             foreach ($items as $event) {
+
+                $images = [];
+                foreach ($event->getImages() as $image) {
+                    $images[] = [
+                        'id' => $image->getId(),
+                        'name' => $image->getNomImages(),
+                        'url' => 'http://127.0.0.1:8000/uploads/images/' . $image->getNomImages(),
+                    ];
+                }
+
+                
                 $data[] = [
                  
                     'nom_evenement' => $event->getNomEvenement(),
@@ -129,6 +140,7 @@ class EventController extends AbstractController
                     'adresse' => $event->getAdresse(),
                     'nbre_place' => $event->getNbrePlace(),
                     'price_place' => $event->getPricePlace(),
+                    'images' => $images 
                 ];
             }
             return new JsonResponse($data);

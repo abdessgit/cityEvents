@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Images;
 use App\Entity\Categorie;
 use App\Entity\Utilisateur;
 use App\Entity\Ville;
@@ -63,6 +66,13 @@ class Evenements
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $Utilisateur = null;
+
+    #[ORM\OneToMany(mappedBy: 'evenements', targetEntity: Images::class, cascade: ['persist', 'remove'])]
+    private Collection $images;
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
 
 
 
@@ -242,7 +252,33 @@ class Evenements
 
         return $this;
     }
-    
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+ 
+// Ajouter une image
+    public function addImage(Images $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+            $image->setEvenements($this);
+        }
+        return $this;
+    }
+
+    // Retirer une image
+    public function removeImage(Images $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getEvenements() === $this) {
+                $image->setEvenements(null);
+            }
+        }
+        return $this;
+    }
+
+
 
  
 }
