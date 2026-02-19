@@ -408,6 +408,55 @@ class EventController extends AbstractController
    
      return $this->json($data);
         }
+ #[Route('/api/v1/events/{id}/edit', name: 'api_events_edit', methods: ['PATCH','PUT'])]
+    public function edit( int $id, Request $request,  EvenementsRepository $events,VilleRepository $cities, CategorieRepository $categories,    CategoryController $categoryController,    VilleController $villeController ): JsonResponse
+    {
+        $event = $events->find($id);
+        if (!$event) {
+            return new JsonResponse(['error' => 'Evenement introuvable'], 404);
+        }
+        $data = $request->request->all();
+        if (empty($data)) {
+            $data = json_decode($request->getContent(), true);
+        }
+        if (!empty($data['title'])) {
+            $event->setNomEvenement($data['title']);
+        }
+        if (!empty($data['description'])) {
+            $event->setDescriptionEvent($data['description']);
+        }
+        if (!empty($data['address'])) {
+            $event->setAdresse($data['address']);
+        }
+        if (!empty($data['seats'])) {
+            $event->setNbrePlace($data['seats']);
+        }
+        if (!empty($data['price'])) {
+            $event->setPricePlace($data['price']);
+        }
+        if (!empty($data['dateStart'])) {
+            $event->setDateDebut(new \DateTime($data['dateStart']));
+        }
+        if (!empty($data['dateEnd'])) {
+            $event->setDateFin(new \DateTime($data['dateEnd']));
+        }
+        if (!empty($data['cityName'])) {
+            $city = $villeController->getOrCreateCity($this->entityManager, $data['cityName'], $cities);
+            $event->setVille($city);
+        }
+        if (!empty($data['categoryName'])) {
+            $category = $categoryController->getOrCreateCategory($this->entityManager, $data['categoryName'], $categories);
+            $event->setCategorie($category);
+        }
+        $this->entityManager->flush();
+        return new JsonResponse([
+            'message' => 'Evenement modifié avec succes',
+            'event' => [
+                'id' => $event->getId(),
+                'title' => $event->getNomEvenement()
+            ]
+        ]);
+    }
 
 
 
