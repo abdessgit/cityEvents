@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-<<<<<<< HEAD
-=======
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Images;
 use App\Entity\Categorie;
 use App\Entity\Utilisateur;
 use App\Entity\Ville;
->>>>>>> Abdesslam
+
 use App\Repository\EvenementsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -47,8 +45,7 @@ class Evenements
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $price_place = null;
 
-<<<<<<< HEAD
-=======
+
     #[ORM\Column(length: 20, options: ['default' => 'pending'])]
     private ?string $status_validation = 'pending';
 
@@ -60,7 +57,7 @@ class Evenements
 
     private bool $is_Sponsor = false;
 
->>>>>>> Abdesslam
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Categorie $Categorie = null;
@@ -73,8 +70,7 @@ class Evenements
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $Utilisateur = null;
 
-<<<<<<< HEAD
-=======
+
     #[ORM\OneToMany(mappedBy: 'evenements', targetEntity: Images::class, cascade: ['persist', 'remove'])]
     private Collection $images;
     public function __construct()
@@ -84,7 +80,7 @@ class Evenements
 
 
 
->>>>>>> Abdesslam
+
     public function getId(): ?int
     {
         return $this->id;
@@ -186,8 +182,7 @@ class Evenements
         return $this;
     }
 
-<<<<<<< HEAD
-=======
+
     public function getStatusValidation(): ?string
     {
         return $this->status_validation;
@@ -228,7 +223,7 @@ class Evenements
     }
 
 
->>>>>>> Abdesslam
+
     public function getCategorie(): ?Categorie
     {
         return $this->Categorie;
@@ -264,9 +259,8 @@ class Evenements
 
         return $this;
     }
-<<<<<<< HEAD
-}
-=======
+
+
     public function getImages(): Collection
     {
         return $this->images;
@@ -297,4 +291,4 @@ class Evenements
 
  
 }
->>>>>>> Abdesslam
+

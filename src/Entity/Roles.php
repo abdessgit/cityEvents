@@ -26,11 +26,11 @@ class Roles
         return $this->nom_role;
     }
 
-<<<<<<< HEAD
+
     public function setNomRole(string $nom_role): static
-=======
+
     public function setNomRole(string $nom_role): self
->>>>>>> Abdesslam
+
     {
         $this->nom_role = $nom_role;
 
