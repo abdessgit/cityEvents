@@ -16,8 +16,19 @@ class ImagesController extends AbstractController
 
         $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
         $maxSize = 2 * 1024 * 1024; 
-        $uploadedImages = [];
+        $imagesMax = 3;
+       
+       
+          
+        $imagesExsist = $event->getImages()->count();
+        $ImageAMettre = count($files);
 
+        if ( $imagesExsist + $ImageAMettre > $imagesMax) {
+            return ['error' => 'Maximum 3 images autorisées'];
+        }
+
+        $uploadedImages = [];
+       
         foreach ($files as $file) {
             if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
                return ([
@@ -29,6 +40,9 @@ class ImagesController extends AbstractController
                 'error' => "L'image f dapsse le 2 MO."
                 ]);
             }
+
+           
+
             $extension = $file->guessExtension();
             $newFilename = uniqid() . '_' . time() . '.' . $extension;
 

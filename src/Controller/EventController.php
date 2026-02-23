@@ -29,9 +29,10 @@ class EventController extends AbstractController
         $data = $request->request->all();
         
         $files = $request->files->get('images');
-        if ($files && !is_array($files)) {
-            $files = [$files];
+        if (!$files || count($files) === 0) {
+        return new JsonResponse(['error' => 'Images obligatoires'], 400);
         }
+
 
 
         $required = [
@@ -86,8 +87,11 @@ class EventController extends AbstractController
        
 
 
+
+
+
         $this->entityManager->persist($event);
-        $this->entityManager->flush();
+        
 
 
         $uploadedImages = [];
@@ -100,6 +104,7 @@ class EventController extends AbstractController
 
             $uploadedImages = $result; 
         }
+        $this->entityManager->flush();
        
     return new JsonResponse([
         'message' => 'Événement créé avec succès',
@@ -390,8 +395,18 @@ class EventController extends AbstractController
                return new JsonResponse(['message' => 'Aucun événement sponsorisé trouvé'], JsonResponse::HTTP_NOT_FOUND);
        
     }
+  
       $data = [];
         foreach ($eventsSponsor as $event) {
+             $images = [];
+                foreach ($event->getImages() as $image) {
+                    $images[] = [
+                        'id' => $image->getId(),
+                        'name' => $image->getNomImages(),
+                        'url' => 'http://127.0.0.1:8000/uploads/images/' . $image->getNomImages(),
+                    ];
+                }
+
             $data[] = [
                
                 'nom_evenement' => $event->getNomEvenement(),
@@ -401,7 +416,7 @@ class EventController extends AbstractController
                 'adresse' => $event->getAdresse(),
                 'nbre_place' => $event->getNbrePlace(),
                 'price_place' => $event->getPricePlace(),
-          
+                'images' => $images 
             ];
         }
 
