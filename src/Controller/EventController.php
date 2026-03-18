@@ -112,7 +112,7 @@ class EventController extends AbstractController
     }
 
 
-    #[Route('/api/v1//events_list', name: 'api_events_list_simple', methods: ['GET'])]
+    #[Route('/api/v1/events_list', name: 'api_events_list_simple', methods: ['GET'])]
     public function listSimple(EvenementsRepository $events): JsonResponse
         {
             // Liste simple des events sans filtres
@@ -131,7 +131,7 @@ class EventController extends AbstractController
 
                 
                 $data[] = [
-                 
+                    'id' => $event->getId(),
                     'nom_evenement' => $event->getNomEvenement(),
                     'description_event' => $event->getDescriptionEvent(),
                     'date_creation' => $event->getDateCreation()?->format('Y-m-d H:i:s'),
@@ -140,7 +140,7 @@ class EventController extends AbstractController
                     'adresse' => $event->getAdresse(),
                     'nbre_place' => $event->getNbrePlace(),
                     'price_place' => $event->getPricePlace(),
-                    'images' => $images 
+                    'images' => $images
                 ];
             }
             return new JsonResponse($data);
@@ -392,8 +392,17 @@ class EventController extends AbstractController
     }
       $data = [];
         foreach ($eventsSponsor as $event) {
+            $images = [];
+            foreach ($event->getImages() as $image) {
+                $images[] = [
+                    'id' => $image->getId(),
+                    'name' => $image->getNomImages(),
+                    'url' => 'http://127.0.0.1:8000/uploads/images/' . $image->getNomImages(),
+                ];
+            }
+
             $data[] = [
-               
+                'id' => $event->getId(),
                 'nom_evenement' => $event->getNomEvenement(),
                 'description_event' => $event->getDescriptionEvent(),
                 'date_debut' => $event->getDateDebut()->format('Y-m-d H:i:s'),
@@ -401,7 +410,7 @@ class EventController extends AbstractController
                 'adresse' => $event->getAdresse(),
                 'nbre_place' => $event->getNbrePlace(),
                 'price_place' => $event->getPricePlace(),
-          
+                'images' => $images,
             ];
         }
 

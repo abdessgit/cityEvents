@@ -175,6 +175,7 @@ public function debloquerUser( int $id, EntityManagerInterface $manager): JsonRe
         }
 
         return $this->json([
+            'userId' => $user->getId(),
             'email' => $user->getEmailUtilisateur(),
             'roles' => $user->getRoles(),
             'nom' => $user->getNomUtilisateur(),
