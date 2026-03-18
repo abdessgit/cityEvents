@@ -140,6 +140,8 @@ class EventController extends AbstractController
                     'adresse' => $event->getAdresse(),
                     'nbre_place' => $event->getNbrePlace(),
                     'price_place' => $event->getPricePlace(),
+                    'user_id' => $event->getUtilisateur()?->getId(),
+                    'user_email' => $event->getUtilisateur()?->getEmailUtilisateur(),
                     'images' => $images
                 ];
             }
@@ -290,6 +292,8 @@ class EventController extends AbstractController
                 'price_place' => $event->getPricePlace(),
                 'status_validation' => $event->getStatusValidation(),
                 'is_sponsor' => $event->getIsSponsor(),
+                'user_id' => $event->getUtilisateur()?->getId(),
+                'user_email' => $event->getUtilisateur()?->getEmailUtilisateur(),
             ];
         }
 
